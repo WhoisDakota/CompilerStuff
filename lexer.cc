@@ -244,6 +244,9 @@ Token LexicalAnalyzer::ScanNumber()
 
 //####################################################
 
+
+//BASE16NUM
+
         return tmp;
 
     } else {
