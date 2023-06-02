@@ -25,6 +25,8 @@ string reserved[] = { "END_OF_FILE",
 
 #define KEYWORDS_COUNT 5
 string keyword[] = { "IF", "WHILE", "DO", "THEN", "PRINT" };
+char digit8[] = {'0', '1', '2', '3', '4', '5', '6', '7'};
+char pDigit8[] = {'1', '2', '3', '4', '5', '6', '7'};
 
 void Token::Print()
 {
@@ -62,6 +64,24 @@ bool LexicalAnalyzer::SkipSpace()
     return space_encountered;
 }
 
+bool LexicalAnalyzer::isPdigit8(char s) {
+    for (int i = 0; i < 7; i++){
+        if(s == pDigit8[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool LexicalAnalyzer::isDigit8(char s) {
+    for (int i = 0; i < 8; i++){
+        if(s == digit8[i]) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool LexicalAnalyzer::IsKeyword(string s)
 {   // IF, WHILE, DO, THEN OR PRINT
     for (int i = 0; i < KEYWORDS_COUNT; i++) {
@@ -86,6 +106,10 @@ Token LexicalAnalyzer::ScanNumber()
 {
     char c;
     char dot;
+    char nextDigit8;
+    char octalX;
+    char octal0;
+    char octal8;
 
 
                                  // NUM
@@ -139,6 +163,87 @@ Token LexicalAnalyzer::ScanNumber()
             }
         }
 //####################################################
+
+    //BASE08NUM
+    if(tmp.token_type == NUM) {
+
+        //case 1: pdigit x 08
+
+        if (isPdigit8(c)) {
+            input.GetChar(octalX);
+            if (octalX == 'x') {
+                input.GetChar(octal0);
+                input.GetChar(octal8);
+                if (octal0 == '0' && octal8 == '8') {
+                    tmp.token_type = BASE08NUM;
+                    tmp.lexeme += "x08";
+                    tmp.line_no = line_no;
+                } else {
+                    input.UngetChar(octal8);
+                    input.UngetChar(octal0);
+                }
+            } else {
+                input.UngetChar(octalX);
+            }
+        }
+            //case 2, pdigit digit* x08
+
+        else if (isPdigit8(c)) {
+            input.GetChar(nextDigit8);
+            if (isDigit8(nextDigit8)) {
+                while (!input.EndOfInput() && isDigit8(nextDigit8)) {
+                    tmp.lexeme += nextDigit8;
+                    input.GetChar(nextDigit8);
+                }
+                if (!input.EndOfInput() && nextDigit8 == 'x') {
+                    input.GetChar(octal0);
+                    input.GetChar(octal8);
+                    if (octal0 == '0' && octal8 == '8') {
+                        tmp.token_type = BASE08NUM;
+                        tmp.lexeme += "x08";
+                        tmp.line_no = line_no;
+
+                    }
+                    else if (!input.EndOfInput()) {
+                        input.UngetChar(octal8);
+                        input.UngetChar(octal0);
+                    }
+                }
+                else if (!input.EndOfInput()) {
+                    input.UngetChar(nextDigit8);
+                }
+            } else if (!input.EndOfInput() && nextDigit8 != 'x') {
+                input.UngetChar(nextDigit8);
+            }
+
+        }
+
+            //case 3, 0 x 08
+
+        else if (c == '0') {
+            input.GetChar(nextDigit8);
+            if (!input.EndOfInput() && nextDigit8 == 'x') {
+                input.GetChar(octal0);
+                input.GetChar(octal8);
+                if (octal0 == '0' && octal8 == '8') {
+                    tmp.token_type = BASE08NUM;
+                    tmp.lexeme += "x08";
+                    tmp.line_no = line_no;
+
+                }
+                else if (!input.EndOfInput() && ((octal0 != '0') || (octal8 != '8'))) {
+                    input.UngetChar(octal8);
+                    input.UngetChar(octal0);
+                }
+            }
+            else if(!input.EndOfInput() && nextDigit8 != 'x'){
+                input.UngetChar(nextDigit8);
+            }
+        }
+    }
+
+//####################################################
+
         return tmp;
 
     } else {
