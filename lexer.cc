@@ -61,8 +61,20 @@ bool LexicalAnalyzer::SkipSpace()
 void LexicalAnalyzer::RemoveComments() {
     char c;
     input.GetChar(c);
-//TODO: not entirely sure how to remove comments
-
+    if(c == '/'){
+        char c2;
+        input.GetChar(c2);
+        if(c2 == '/'){
+            char comments;
+            input.GetChar(comments);
+            while(comments != '\n' && !input.EndOfInput()){
+                input.GetChar(comments);
+            }
+            if(!input.EndOfInput()){        //out of comments
+                input.UngetChar(comments);
+            }
+        }
+    }
 }
 
 bool LexicalAnalyzer::IsKeyword(string s)
@@ -84,25 +96,7 @@ TokenType LexicalAnalyzer::FindKeywordIndex(string s) {
     return (tmp.token_type);
 }
 
-/*Token LexicalAnalyzer::ScanNumber()
-{
-    char c;
-    input.GetChar(c);
-    if (isdigit(c)) {
-        tmp.lexeme = "";
-        while (!input.EndOfInput() && isdigit(c)) {
-                tmp.lexeme += c;
-                input.GetChar(c);
-            }
-            if (!input.EndOfInput()) {
-                input.UngetChar(c);
-            }
-        }
-    tmp.token_type = digit;
-    tmp.line_no = line_no;
-    return tmp;
-}
-*/
+
 Token LexicalAnalyzer::ScanIdOrKeyword()
 {
     char c;
@@ -187,15 +181,10 @@ Token LexicalAnalyzer::GetToken()
                 input.UngetChar(c);
                 return ScanIdOrKeyword();
             }
-            /*else if(c == '/'){
-                char c2;
-                input.GetChar(c2);
-                if (c2 == '/') {
-                    input.UngetChar(c2);
-                    input.UngetChar(c);
-                    RemoveComments();
-                }
-            }*/ //TODO: not entirely certain how to remove comments
+            else if(c == '/'){
+                input.UngetChar(c);
+                RemoveComments();
+            }
             else if (input.EndOfInput())
                 tmp.token_type = END_OF_FILE;
             else
