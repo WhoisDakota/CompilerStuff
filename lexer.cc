@@ -58,7 +58,12 @@ bool LexicalAnalyzer::SkipSpace()
     return space_encountered;
 }
 
+void LexicalAnalyzer::RemoveComments() {
+    char c;
+    input.GetChar(c);
+//TODO: not entirely sure how to remove comments
 
+}
 
 bool LexicalAnalyzer::IsKeyword(string s)
 {   // IF, WHILE, DO, THEN OR PRINT
@@ -104,7 +109,7 @@ Token LexicalAnalyzer::ScanIdOrKeyword()
 
     input.GetChar(c);
 
-    if (isalpha(c)) {
+    if (isalpha(c) && !input.EndOfInput()) {
         tmp.lexeme = "";
         while (!input.EndOfInput() && isalnum(c)) {  //isalnum == (isalpha(c) || isdigit(c) )
             tmp.lexeme += c;
@@ -182,20 +187,15 @@ Token LexicalAnalyzer::GetToken()
                 input.UngetChar(c);
                 return ScanIdOrKeyword();
             }
-            if(c == '/'){
+            /*else if(c == '/'){
                 char c2;
                 input.GetChar(c2);
                 if (c2 == '/') {
                     input.UngetChar(c2);
                     input.UngetChar(c);
-                    SkipSpace();
+                    RemoveComments();
                 }
-                else
-                {
-                    tmp.lexeme += c;
-                    return ScanIdOrKeyword();
-                }
-            }
+            }*/ //TODO: not entirely certain how to remove comments
             else if (input.EndOfInput())
                 tmp.token_type = END_OF_FILE;
             else
