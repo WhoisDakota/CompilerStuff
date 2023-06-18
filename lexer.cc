@@ -10,6 +10,8 @@
 #include <cctype>
 
 #include "lexer.h"
+#include <parser.h>
+
 #include "inputbuf.h"
 
 using namespace std;
