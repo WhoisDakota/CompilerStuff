@@ -1,8 +1,8 @@
 
 #include <vector>
 #include <string>
-#include <lexer.h>
-#include <inputbuf.h>
+#include "lexer.h"
+#include "inputbuf.h"
 
 #ifndef PROJECT1_PARSER_H
 #define PROJECT1_PARSER_H
@@ -14,7 +14,7 @@ public:     //can be accessed by other programs
 
     Parser();
 
-    void Print();
+
     void parse_Program(LexicalAnalyzer);
     void parse_global_vars(LexicalAnalyzer);
     void parse_var_list(LexicalAnalyzer);
@@ -25,8 +25,8 @@ public:     //can be accessed by other programs
     void parse_stmt(LexicalAnalyzer);
     void syntax_error();
 
-private:
     Token tmp;
+
     //InputBuffer input;
 
 };

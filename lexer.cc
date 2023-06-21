@@ -10,7 +10,7 @@
 #include <cctype>
 
 #include "lexer.h"
-#include <parser.h>
+#include "parser.h"
 
 #include "inputbuf.h"
 
@@ -194,7 +194,7 @@ Token LexicalAnalyzer::GetToken()
             return tmp;
     }
 }
-
+/*
 int main()
 {
     LexicalAnalyzer lexer;
@@ -208,3 +208,4 @@ int main()
         token.Print();
     }
 }
+*/

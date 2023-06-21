@@ -32,6 +32,7 @@ class LexicalAnalyzer {
     Token GetToken();
     TokenType UngetToken(Token);
     LexicalAnalyzer();
+    bool IsKeyword(std::string);
 
   private:
     std::vector<Token> tokens;
@@ -41,7 +42,7 @@ class LexicalAnalyzer {
 
     bool SkipSpace();
     void RemoveComments();
-    bool IsKeyword(std::string);
+    //bool IsKeyword(std::string);
     TokenType FindKeywordIndex(std::string);
     Token ScanIdOrKeyword();
     Token ScanNumber();

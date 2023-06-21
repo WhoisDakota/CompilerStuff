@@ -6,9 +6,9 @@
 #include <iostream>
 #include <istream>
 #include <string>
-#include <cctype>
-#include <lexer.h>
-#include <inputbuf.h>
+
+#include "lexer.h"
+#include "inputbuf.h"
 
 /*
  * need one function for each non-terminal of grammar to handle
@@ -18,13 +18,9 @@
  * */
 
 Parser::Parser(){
-    tmp.lexeme = "";
-    tmp.token_type = ERROR;
+    //tmp.lexeme = "";
+    //tmp.token_type = ERROR;
 }
-void Parser::Print() {
-
-}
-
 
 void Parser::parse_Program(LexicalAnalyzer lexer) {
    Token t =  lexer.GetToken();
@@ -38,7 +34,7 @@ void Parser::parse_Program(LexicalAnalyzer lexer) {
    //no need to check follow set as while global_vars has epsilon in first set, scope does not.
    else{
        syntax_error();
-       //printf("Syntax Error");
+
    }
 }
 
@@ -79,9 +75,12 @@ void Parser::parse_var_list(LexicalAnalyzer lexer) {
             parse_var_list(lexer);
             printf("var_list->ID COMMA var_list\n");
         }
-        else{
+        else if (lexer.IsKeyword(tmpToken.lexeme) && tmpToken.token_type != ID){
             lexer.UngetToken(tmpToken);
             printf("var_list->ID\n");
+        }
+        else{
+            syntax_error();
         }
     }
     //epsilon does NOT exist in first(var_list), therefore no need to check follow set.
@@ -190,14 +189,58 @@ void Parser::parse_stmt_list(LexicalAnalyzer lexer) {
         parse_stmt(lexer);
         t = lexer.GetToken();
         //check first rule stmt_list -> stmt
-        //TODO: how do i determine if the rule stmt_list->stmt is being used OR stmt_list-> stmt stmt_list?
+        if(t.token_type == ID){
+            lexer.UngetToken(t);
+            parse_stmt_list(lexer);
+            printf("stmt_list->stmt stmt_list");
+        }
+        else if(t.token_type != ID){
+            printf("stmt_list->stmt");
+        }
+    }
+    //epsilon NOT in first set, so no follow set to check
 
+    else
+    {
+        syntax_error();
     }
 }
 
 void Parser::parse_stmt(LexicalAnalyzer lexer) {
-
-
+    Token t = lexer.GetToken();
+    //First(stmt): {ID}
+    if(t.token_type == ID){
+        Token t2 = lexer.GetToken();
+        if(t2.token_type == EQUAL){
+            Token t3 = lexer.GetToken();
+            if(t3.token_type == ID){
+                Token t4 = lexer.GetToken();
+                if(t4.token_type == SEMICOLON){
+                    printf("stmt->ID EQUAL ID SEMICOLON");
+                }
+                else{
+                    lexer.UngetToken(t4);
+                    syntax_error();
+                }
+            }
+            else{
+                lexer.UngetToken(t3);
+                syntax_error();
+            }
+        }
+        else if (t2.token_type == ID){      //stmt->scope
+            lexer.UngetToken(t2);
+            parse_scope(lexer);
+            printf("stmt->scope");
+        }
+        else{
+            lexer.UngetToken(t2);
+            syntax_error();
+        }
+    }
+    else{
+        syntax_error();
+    }
 }
 
 
