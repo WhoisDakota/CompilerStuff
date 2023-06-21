@@ -12,16 +12,23 @@ class Parser {
 
 public:     //can be accessed by other programs
 
+    Parser();
+
     void Print();
-    Token parse_Program();
-    Token parse_global_vars();
-    Token parse_var_list();
-    Token parse_scope();
-    Token parse_public_vars();
-    Token parse_private_vars();
-    Token parse_stmt_list();
-    Token parse_stmt();
-    Token syntax_error();
+    void parse_Program(LexicalAnalyzer);
+    void parse_global_vars(LexicalAnalyzer);
+    void parse_var_list(LexicalAnalyzer);
+    void parse_scope(LexicalAnalyzer);
+    void parse_public_vars(LexicalAnalyzer);
+    void parse_private_vars(LexicalAnalyzer);
+    void parse_stmt_list(LexicalAnalyzer);
+    void parse_stmt(LexicalAnalyzer);
+    void syntax_error();
+
+private:
+    Token tmp;
+    //InputBuffer input;
+
 };
 
 
