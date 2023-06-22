@@ -15,7 +15,7 @@
 
 typedef enum { END_OF_FILE = 0,
   PUBLIC, PRIVATE, EQUAL, COLON, COMMA, SEMICOLON,
-  LBRACE, RBRACE, ID, ERROR
+  LBRACE, RBRACE, ID, ERROR, REALNUM, NUM
 } TokenType;
 
 class Token {
@@ -24,7 +24,7 @@ class Token {
 
     std::string lexeme;
     TokenType token_type;
-    //int line_no;
+    int line_no;
 };
 
 class LexicalAnalyzer {

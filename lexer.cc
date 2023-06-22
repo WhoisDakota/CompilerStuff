@@ -98,6 +98,71 @@ TokenType LexicalAnalyzer::FindKeywordIndex(string s) {
     return (tmp.token_type);
 }
 
+Token LexicalAnalyzer::ScanNumber()
+{
+    char c;
+    bool realNUM = false;
+    input.GetChar(c);
+    if (isdigit(c)) {
+        if (c == '0') {
+            tmp.lexeme = "0";
+            input.GetChar(c);
+            if(c == '.'){
+                input.GetChar(c);
+
+                if(!isdigit(c)){
+                    input.UngetChar(c);
+                }else{
+                    while (!input.EndOfInput() && isdigit(c)) {
+                        tmp.lexeme += c;
+                        input.GetChar(c);
+                        realNUM = true;
+                    }
+                    input.UngetChar(c);
+                }
+            }else{
+                input.UngetChar(c);
+            }
+        } else {
+            tmp.lexeme = "";
+            while (!input.EndOfInput() && isdigit(c)) {
+                tmp.lexeme += c;
+                input.GetChar(c);
+            }
+            if(c == '.'){
+                input.GetChar(c);
+
+                if(!isdigit(c)){
+                    input.UngetChar(c);
+                }else{
+                    while (!input.EndOfInput() && isdigit(c)) {
+                        tmp.lexeme += c;
+                        input.GetChar(c);
+                        realNUM = true;
+                    }
+                }
+            }
+            if (!input.EndOfInput()) {
+                input.UngetChar(c);
+            }
+        }
+        if(realNUM){
+            tmp.token_type = REALNUM;
+        }else{
+            tmp.token_type = NUM;
+        }
+        tmp.line_no = line_no;
+        return tmp;
+    } else {
+        if (!input.EndOfInput()) {
+            input.UngetChar(c);
+        }
+        tmp.lexeme = "";
+        tmp.token_type = ERROR;
+        tmp.line_no = line_no;
+        return tmp;
+    }
+}
 
 Token LexicalAnalyzer::ScanIdOrKeyword()
 {
